@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/src/{index.js,functions/*.js}",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
@@ -23,8 +24,5 @@
     "azure-functions-core-tools": "^4.x",
     "rimraf": "^5.0.0",
     "typescript": "^5.0.0"
-  },
-  "overrides": {
-    "glob": "^13.0.6"    
   }
 }

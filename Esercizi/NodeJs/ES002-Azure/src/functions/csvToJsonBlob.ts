@@ -1,9 +1,11 @@
 import { app, InvocationContext } from "@azure/functions";
 
-import { v4 as uuidv4 } from 'uuid';
 import { CsvToJsonTransformer } from "../services/csvTransformer.js";
 import { getAppConfig } from "../config/appConfig.js";
 import { StorageService } from "../services/storageService.js";
+
+// import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto'
 
 export async function csvToJsonBlobTrigger(
     blob: Buffer, 
@@ -37,7 +39,8 @@ export async function csvToJsonBlobTrigger(
         context.log(`Total successfully transformed CSV to JSON for blob : ${jsonData.length} records`);
 
         // Preparazione del nome del blob di destinazione per il JSON e il CSV da archiviare
-        const uuid = uuidv4();
+        //const uuid = uuidv4();
+        const uuid = randomUUID();
         const csvBlobDestName = `${uuid}.csv`;
         const jsonBlobName = `${uuid}.json`;
         context.log(`Generated CSV blob name: ${csvBlobDestName}`);
