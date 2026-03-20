@@ -117,9 +117,8 @@ export class StorageService {
                 throw new Error(`Source blob ${sourceBlobName} does not exist`);
             }
             
-            // Copia il blob nella nuova posizione
-            const copyPoller = await destinationBlobClient.beginCopyFromURL(sourceBlobClient.url);
-            await copyPoller.pollUntilDone();
+            // Copia il blob nella nuova posizione (server-side sync copy — nessun polling attivo)
+            await destinationBlobClient.syncCopyFromURL(sourceBlobClient.url);
 
             // Elimina il blob originale dopo la copia
             await sourceBlobClient.delete();

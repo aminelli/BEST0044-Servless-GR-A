@@ -7,6 +7,11 @@ import { StorageService } from "../services/storageService.js";
 // import { v4 as uuidv4 } from 'uuid';
 import { randomUUID } from 'crypto'
 
+// Inizializzati una sola volta al cold start e riutilizzati nelle invocazioni successive
+const config = getAppConfig();
+const service = new StorageService(config);
+const transformer = new CsvToJsonTransformer();
+
 export async function csvToJsonBlobTrigger(
     blob: Buffer, 
     context: InvocationContext
@@ -25,16 +30,12 @@ export async function csvToJsonBlobTrigger(
             return;
         }
 
-        const config = getAppConfig();
-        const service = new StorageService(config);
-        const transformer = new CsvToJsonTransformer();
-
         // Conversione del contenuto del blob da Buffer a stringa
         const csvContent = blob.toString('utf-8');
         context.log(`CSV content length: ${csvContent.length} characters`);
 
         // Trasformazione del CSV in JSON
-        const jsonData = transformer.transform(csvContent);
+        const jsonData = await transformer.transform(csvContent);
         const jsonString = transformer.toJsonString(jsonData);
         context.log(`Total successfully transformed CSV to JSON for blob : ${jsonData.length} records`);
 
@@ -53,17 +54,15 @@ export async function csvToJsonBlobTrigger(
         // Spostiamo il file CSV originale nella cartella di archiviazione con un nome unico
         const destinationBlobName = `${config.csvParsedFolderPath}/${csvBlobDestName}`;
         // await service.writeBlobFromString(archivePath, csvContent, 'text/csv');
-        await service.moveBlob(blobName, destinationBlobName);
-        
-
-
+        await service.moveBlob(blobName, destinationBlobName);  
 
 
     } catch (error) {
         if (error instanceof Error) {
             context.log(`Error processing blob ${blobName}: ${error.message}`);
-        }
+        } else {
             context.log(`Unknown error processing blob ${blobName}`);
+        }
     } finally {
 
     }

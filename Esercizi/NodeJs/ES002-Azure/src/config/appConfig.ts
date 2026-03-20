@@ -8,7 +8,7 @@
         "OUTPUT_FOLDER_PATH": "json",
         "CSV_PARSED_FOLDER_PATH": "csv_parsed",
 
-        "AZURE_STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=best0044grastorage;AccountKey=C+ojohV534z35a+nJYNEcLTUKfDIyK27oSbenFm3qgYFNyFr7GSPmR4hw2o+cwPVM1v5ObIrMox1+AStbrGH9g==;EndpointSuffix=core.windows.net"
+        "AZURE_STORAGE_CONNECTION_STRING": "<usare local.settings.json in locale o Azure App Settings in produzione — non hardcodare mai le credenziali nel codice sorgente>"
 
 */
 

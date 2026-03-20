@@ -1,4 +1,4 @@
-import { parse } from 'csv-parse/sync';
+import { parse } from 'csv-parse';
 
 /**
  * Interfaccia che rappresenta una riga del CSV come un oggetto con chiavi dinamiche.
@@ -31,37 +31,35 @@ export interface CsvParserOptions {
 
 export class CsvToJsonTransformer {
 
-    public transform(csvContent:string, options? : CsvParserOptions): CsvRow[] {
-        try {
-            // Validazione dati nel caso in cui csvContent sia null, undefined o non una stringa
-            if (!csvContent || typeof csvContent !== 'string' || csvContent.trim().length === 0) {
-                throw new Error('Invalid CSV content: content must be a non-empty string');
-            }
-
-            const parserOptions: CsvParserOptions = {
-                delimiter: options?.delimiter || ',',
-                columns: options?.columns ?? true, // Usa la prima riga come intestazione per default
-                skip_empty_lines: options?.skip_empty_lines ?? false,
-                trim: options?.trim ?? false,
-                trimValues: options?.trimValues ?? false,
-                relax_column_count: true, // Permette righe con un numero diverso di campi
-                skip_records_with_error: true // Ignora le righe che causano errori di parsing
-            };
-
-            // Parsing del CSV in un array di oggetti CsvRow
-            const records = parse(csvContent, parserOptions) as unknown as CsvRow[];
-
-            if (!Array.isArray(records) || records.length === 0) {
-                throw new Error('Parsed CSV data is empty or not an array');                
-            }
-            return records;
-
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Error parsing CSV content: ${error.message}`);
-            }
-            throw new Error('Unknown error parsing CSV content');
+    public async transform(csvContent: string, options?: CsvParserOptions): Promise<CsvRow[]> {
+        // Validazione dati nel caso in cui csvContent sia null, undefined o non una stringa
+        if (!csvContent || typeof csvContent !== 'string' || csvContent.trim().length === 0) {
+            throw new Error('Invalid CSV content: content must be a non-empty string');
         }
+
+        const parserOptions: CsvParserOptions = {
+            delimiter: options?.delimiter || ',',
+            columns: options?.columns ?? true, // Usa la prima riga come intestazione per default
+            skip_empty_lines: options?.skip_empty_lines ?? false,
+            trim: options?.trim ?? false,
+            trimValues: options?.trimValues ?? false,
+            relax_column_count: true, // Permette righe con un numero diverso di campi
+            skip_records_with_error: true // Ignora le righe che causano errori di parsing
+        };
+
+        // Parsing asincrono del CSV: non blocca l'event loop
+        return new Promise<CsvRow[]>((resolve, reject) => {
+            parse(csvContent, parserOptions, (err: Error | undefined, records: unknown) => {
+                if (err) {
+                    return reject(new Error(`Error parsing CSV content: ${err.message}`));
+                }
+                const rows = records as CsvRow[];
+                if (!Array.isArray(rows) || rows.length === 0) {
+                    return reject(new Error('Parsed CSV data is empty or not an array'));
+                }
+                resolve(rows);
+            });
+        });
     }
 
     public toJsonString(data: CsvRow[], pretty: boolean = true): string {
