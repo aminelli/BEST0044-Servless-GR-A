@@ -13,7 +13,7 @@ $folderDeployTemp = "$($folderDeploy)\deploy-$suffix"
 New-Item -ItemType Directory -Path $folderDeployTemp
 
 # Copia i file necessari per il deploy
-Copy-Item -Path "dist\*" -Destination $folderDeployTemp -Recurse
+Copy-Item -Path "dist" -Destination "$($folderDeployTemp)" -Recurse
 # Copy-Item -Path "node_modules" -Destination $folderDeployTemp -Recurse
 Copy-Item -Path "package.json" -Destination $folderDeployTemp
 Copy-Item -Path "host.json" -Destination $folderDeployTemp
@@ -28,9 +28,11 @@ Set-Location ..
 $zipPath = "deploy\$($functionAppName)-$suffix.zip"
 Compress-Archive -Path "$folderDeployTemp\*" -DestinationPath $zipPath -Force
 
-az functionapp deployment source config-zip --resource-group "BEST0044-GR-A-Servless" --name $functionAppName --src $zipPath --build-remote true    
 
-az functionapp deployment source config-zip --resource-group "BEST0044-GR-A-Servless" --name "best0044graapp01" --src "deploy\best0044graapp01-20260320-123240.zip" --build-remote true    
+
+# az functionapp deployment source config-zip --resource-group "BEST0044-GR-A-Servless" --name $functionAppName --src $zipPath --build-remote true    
+
+#az functionapp deployment source config-zip --resource-group "BEST0044-GR-A-Servless" --name "best0044graapp01" --src "deploy\best0044graapp01-20260320-123240.zip" --build-remote true    
 # Cleanup
 # Remove-Item "$folderDeployTemp" -Recurse -Force
 
