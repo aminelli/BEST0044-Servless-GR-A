@@ -2,6 +2,16 @@
     "IsEncrypted": false,
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-        "FUNCTIONS_WORKER_RUNTIME": "node"
+        "FUNCTIONS_WORKER_RUNTIME": "node",
+        
+        "RESOUCE_GROUP": "BEST0044-GR-A-Servless",
+        "STORAGE_ACCOUNT_NAME": "best0044grastorage",
+        "STORAGE_CONTAINER_NAME": "data",
+        
+        "INPUT_FOLDER_PATH": "csv",
+        "OUTPUT_FOLDER_PATH": "json",
+        "CSV_PARSED_FOLDER_PATH": "csv_parsed",
+
+        "AZURE_STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=best0044grastorage;AccountKey=C+ojohV534z35a+nJYNEcLTUKfDIyK27oSbenFm3qgYFNyFr7GSPmR4hw2o+cwPVM1v5ObIrMox1+AStbrGH9g==;EndpointSuffix=core.windows.net"
     }
 }

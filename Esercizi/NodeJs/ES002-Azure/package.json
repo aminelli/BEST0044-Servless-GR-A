@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/src/{index.js,functions/*.js}",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
@@ -12,12 +13,16 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "@azure/functions": "^4.11.0"
+    "@azure/functions": "^4.11.0",
+    "@azure/identity": "^4.13.1",
+    "@azure/storage-blob": "^12.31.0",
+    "csv-parse": "^6.2.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "azure-functions-core-tools": "^4.x",
     "@types/node": "^22.x",
-    "typescript": "^5.0.0",
-    "rimraf": "^5.0.0"
+    "azure-functions-core-tools": "^4.x",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0"
   }
 }
