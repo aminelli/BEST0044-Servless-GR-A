@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import { RowDataPacket, ResultSetHeader } from 'mysql2'
 import pool from '../config/database';
-import { Customer, CustomerQueryParams, CustomerStats, PaginatedResponse } from '../models/customer.model';
+import { Customer, PaginatedResponse } from '../models/customer.model';
 import logger from '../utils/logger';
 import { AppError } from '../middleware/errorHandler';
 

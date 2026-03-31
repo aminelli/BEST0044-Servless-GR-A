@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+// import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import logger from '../utils/logger';
 
 /**
@@ -24,7 +25,7 @@ export const errorHandler = (
   err: Error | AppError,
   req: Request,
   res: Response,
-  next: NextFunction
+  //next: NextFunction
 ): void => {
   // Default error values
   let statusCode = 500;

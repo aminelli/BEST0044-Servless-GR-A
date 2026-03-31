@@ -82,6 +82,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ==============================
 
 app.get('/health', (req: Request, res: Response) => {
+    console.log(req.path);  
     res.status(200).json({ 
         // Stato del server, in questo caso sempre 'ok' se raggiungibile
         status: 'ok', 
@@ -93,6 +94,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 app.get('/ready', async (req: Request, res: Response) => {
+    console.log(req.path); 
     const dbConnected = await testConnection();
     if (dbConnected) {
         return res.status(200).json({ 
@@ -124,6 +126,7 @@ app.get('/ready', async (req: Request, res: Response) => {
 app.use('/api/customers', customerRoute);
 
 app.get('/', (req: Request, res: Response) => {
+    console.log(req.path);  
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

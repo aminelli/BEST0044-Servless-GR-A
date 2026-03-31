@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    hostname: mysql-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: customers_db
+      MYSQL_USER: webapp_user
+      MYSQL_PASSWORD: webapp_pass
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./setup.sql:/docker-entrypoint-initdb.d/setup.sql
+    networks:
+      - webapp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webapp_customers
+    hostname: webapp_customers
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - webapp-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    environment:
+      NODE_ENV: production
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_USER: webapp_user
+      DB_PASSWORD: webapp_pass
+      DB_NAME: customers_db
+      PORT: 3000
+      RATE_LIMIT_WINDOW_MINUTES: 15
+      RATE_LIMIT_MAX_REQUESTS: 100
+      CLOUD_PROVIDER: local
+
+
+networks:
+  webapp-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
