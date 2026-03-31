@@ -41,7 +41,7 @@ export interface PaginatedResponse<T> {
 
 
 // Interfaccia dati statistici
-export interface CustoimerStats {
+export interface CustomerStats {
     total: number;
     recentlyAdded: number;
     withComopany: number;

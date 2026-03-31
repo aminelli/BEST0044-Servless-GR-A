@@ -36,3 +36,15 @@ export async function testConnection(): Promise<boolean> {
         return false;
     }
 }
+
+// Chiusura graceful del pool di connessioni verso il db
+export async function closePool(): Promise<void> {
+    try {
+        await pool.end();
+        console.log('Database pool closed successfully');
+    } catch (error) {
+        console.error('Error closing database pool:', error);
+    }
+}
+
+export default pool;

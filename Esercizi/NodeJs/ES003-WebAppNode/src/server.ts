@@ -5,8 +5,11 @@ import cors from 'cors';
 import compression from 'compression'; 
 import rateLimit from 'express-rate-limit';
 import path from 'path';
-import { testConnection } from './config/database';
- 
+import { closePool, testConnection } from './config/database';
+
+import customerRoute from './routes/customers.routes';
+import { notFoundHandler, errorHandler } from './middleware/errorHandler'
+import logger from './utils/logger';
 
 // Caricamento delle vcariabili d'ambiente da .env
 dotenv.config();
@@ -118,4 +121,68 @@ app.get('/ready', async (req: Request, res: Response) => {
 // API Routes
 // ==============================
 
-app.use('/api/customers', require('./routes/customers'));
+app.use('/api/customers', customerRoute);
+
+app.get('/', (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+
+const server = app.listen(PORT, async() => {
+    logger.info(`Server in ascolto sulla porta ${PORT}`);
+    logger.info(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
+
+    // Test della connessione al database all'avvio del server
+    const dbConnected = await testConnection();
+    if (!dbConnected) {
+        logger.warn('Impossibile connettersi al database all\'avvio del server. Verifica la configurazione e lo stato del database.');
+    }
+});
+
+
+/* Graceful  shutdown */
+
+const gracefulShutdown = async (signal: string) => {
+    logger.info(`Ricevuto segnale ${signal}, avviando la chiusura del server...`);
+
+    server.close(async () => {
+        logger.info('Server chiuso con successo.');
+        try {
+          await closePool();
+          process.exit(0);
+        } catch (error) {
+            logger.error('Errore durante la chiusura del pool di connessioni:', error);
+            process.exit(1);
+        }
+    });
+    
+    // Forzare lo shutdown dopo 10 secondi se il server non si chiude correttamente
+    setTimeout(() => {
+        logger.warn('Forzando la chiusura del server dopo 10 secondi...');
+        process.exit(1);
+    }, 10000);
+}
+
+
+// Gestione dei segnali di terminazione per una chiusura pulita
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Gestione promesse non gestite
+
+process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
+    logger.error('Promessa non gestita:', reason);
+    //gracefulShutdown('UNHANDLED_REJECTION');
+});
+
+// Gestione errori non catturati 
+process.on('uncaughtException', (error: Error) => {
+    logger.error('Eccezione non catturata:', error);
+    gracefulShutdown('UNCAUGHT_EXCEPTION');
+});
+
+
+export default app;
