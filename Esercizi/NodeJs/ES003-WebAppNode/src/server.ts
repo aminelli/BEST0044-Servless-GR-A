@@ -5,6 +5,7 @@ import cors from 'cors';
 import compression from 'compression'; 
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import { testConnection } from './config/database';
  
 
 // Caricamento delle vcariabili d'ambiente da .env
@@ -88,3 +89,33 @@ app.get('/health', (req: Request, res: Response) => {
     });
 });
 
+app.get('/ready', async (req: Request, res: Response) => {
+    const dbConnected = await testConnection();
+    if (dbConnected) {
+        return res.status(200).json({ 
+            // Stato del server, in questo caso 'ready' se il database è connesso   
+            status: 'ready',
+            database: 'connected',
+            // Timestamp dell'ultima verifica di salute
+            timestamp: new Date().toISOString(),
+            // Tempo di attività del server in secondi
+            uptime: process.uptime() 
+        });
+    } else {
+        return res.status(503).json({ 
+            // Stato del server, in questo caso 'not ready' se il database non è connesso   
+            status: 'not ready',
+            database: 'disconnected',
+            // Timestamp dell'ultima verifica di salute
+            timestamp: new Date().toISOString(),
+            // Tempo di attività del server in secondi
+            uptime: process.uptime() 
+        });
+    }   
+});
+
+// ==============================
+// API Routes
+// ==============================
+
+app.use('/api/customers', require('./routes/customers'));
