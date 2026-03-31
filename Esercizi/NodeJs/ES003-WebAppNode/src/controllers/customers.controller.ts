@@ -103,6 +103,7 @@ export class CustomersController {
         try {
          
             const errors = validationResult(req);
+            
             if (!errors.isEmpty()) {
                 res.status(400).json({ 
                     success: false, 
@@ -114,9 +115,11 @@ export class CustomersController {
             const customer: Customer = req.body;
 
             const [existing] = await pool.query<RowDataPacket[]>('SELECT id FROM customers WHERE email = ?', [customer.email]);
+           
             if (existing.length > 0) {
-                res.status(400).json({ success: false, errors: [{ msg: 'Email already exists' }] });
-                return;
+                // res.status(400).json({ success: false, errors: [{ msg: 'Email already exists' }] });
+                // return;
+                throw new AppError('Email already exists', 404);
             }
 
             const [result] = await pool.query<ResultSetHeader>(

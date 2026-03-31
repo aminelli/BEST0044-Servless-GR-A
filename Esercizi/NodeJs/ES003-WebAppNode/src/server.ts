@@ -172,8 +172,7 @@ process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Gestione promesse non gestite
-
-process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
+process.on('unhandledRejection', (reason: any) => {
     logger.error('Promessa non gestita:', reason);
     //gracefulShutdown('UNHANDLED_REJECTION');
 });
